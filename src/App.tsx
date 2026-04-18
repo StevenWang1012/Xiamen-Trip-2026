@@ -65,10 +65,13 @@ export default function App() {
       <header className="sticky top-0 z-30 bg-white shadow-sm shrink-0 h-32 w-full overflow-hidden flex flex-col justify-end">
         <div className="absolute inset-0 bg-slate-900/40 z-10" />
         <img 
-          src="https://picsum.photos/seed/xiamen/800/400" 
-          alt="Xiamen city" 
+          src="/cover.jpg" 
+          alt="Xiamen Twin Towers" 
           className="absolute inset-0 w-full h-full object-cover"
           referrerPolicy="no-referrer"
+          onError={(e) => {
+            e.currentTarget.src = "https://picsum.photos/seed/xiamen/800/400"
+          }}
         />
         <div className="relative z-20 p-5 pb-4">
           <h1 className="text-3xl font-extrabold text-white leading-tight tracking-tight drop-shadow-md flex items-baseline gap-2">
@@ -341,7 +344,18 @@ export default function App() {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white rounded-t-3xl shadow-2xl z-50 p-6 pb-12 flex flex-col max-h-[85vh]"
+              
+              // === 手勢邏輯 ===
+              drag="y" // 限制只能在 Y 軸（上下）拖曳
+              dragConstraints={{ top: 0 }} // 限制面板不能往上拉超過原始位置
+              dragElastic={{ top: 0, bottom: 0.4 }} // 往下拖曳時給予 0.4 的彈性阻尼感，避免手感生硬
+              onDragEnd={(event, info) => {
+                // 實務判定：當下滑位移超過 100px，或是往下的甩動速度大於 500 時，判定為使用者想關閉
+                if (info.offset.y > 100 || info.velocity.y > 500) {
+                  setShowChecklist(false);
+                }
+              }}
+              className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white rounded-t-[32px] shadow-2xl z-50 p-6 pb-12 flex flex-col max-h-[85vh]"
             >
               <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 shrink-0" />
               <h2 className="text-xl font-bold mb-4 shrink-0">行前準備與預約確認</h2>
